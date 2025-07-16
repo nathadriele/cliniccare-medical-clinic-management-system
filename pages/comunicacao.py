@@ -10,7 +10,6 @@ def create_layout():
     """Cria o layout da página de comunicação"""
     
     return html.Div([
-        # Cabeçalho da página
         create_page_header(
             title="Comunicação com Pacientes",
             subtitle="Envie lembretes, mensagens e notificações",

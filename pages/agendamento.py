@@ -10,7 +10,6 @@ def create_layout():
     """Cria o layout da página de agendamento"""
     
     return html.Div([
-        # Cabeçalho da página
         create_page_header(
             title="Agendamento de Consultas",
             subtitle="Gerencie consultas, horários e disponibilidade médica",

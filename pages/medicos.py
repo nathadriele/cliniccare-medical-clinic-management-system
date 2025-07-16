@@ -16,12 +16,10 @@ from utils.relational_checks import integrity_checker, validate_doctor, can_dele
 
 def create_layout():
     return dbc.Container([
-        # Título da página
         dbc.Row([
             dbc.Col([
                 html.H2("👨‍⚕️ Gestão de Médicos", className="mb-4"),
                 
-                # Botão para novo médico
                 dbc.Button(
                     "➕ Novo Médico",
                     id="btn-novo-medico",
