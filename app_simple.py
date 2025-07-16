@@ -4,7 +4,6 @@ import dash_bootstrap_components as dbc
 from datetime import datetime
 import os
 
-# Inicializar a aplicação Dash
 app = dash.Dash(
     __name__,
     external_stylesheets=[
@@ -15,15 +14,11 @@ app = dash.Dash(
     title="ClinicCare - Sistema de Gestão Clínica"
 )
 
-# Configurar servidor
 server = app.server
 
-# Layout principal da aplicação
 app.layout = dbc.Container([
-    # Location para roteamento
     dcc.Location(id='url', refresh=False),
     
-    # Navbar
     dbc.Navbar(
         dbc.Container([
             dbc.NavbarBrand("🏥 ClinicCare", className="ms-2"),
@@ -39,11 +34,9 @@ app.layout = dbc.Container([
         className="mb-4"
     ),
     
-    # Conteúdo da página
     html.Div(id='page-content')
 ], fluid=True)
 
-# Callback para roteamento
 @app.callback(
     Output('page-content', 'children'),
     Input('url', 'pathname')
@@ -185,21 +178,19 @@ def create_financeiro():
         ])
     ])
 
-# Executar aplicação
 if __name__ == '__main__':
     print(f"""
     🏥 ClinicCare - Sistema de Gestão Clínica (Versão Simplificada)
     ============================================================
     
-    🚀 Servidor iniciado com sucesso!
+      Servidor iniciado com sucesso!
     
-    📍 URL: http://127.0.0.1:8050
-    📅 Data: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}
+      URL: http://127.0.0.1:8050
+      Data: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}
     
-    ⚡ Sistema pronto para uso!
+      Sistema pronto para uso!
     """)
     
-    # Executar aplicação
     app.run(
         debug=True,
         host='127.0.0.1',
