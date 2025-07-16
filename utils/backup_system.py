@@ -23,10 +23,8 @@ class BackupSystem:
         self.backup_dir = backup_dir
         self.config_file = "backup_config.json"
         
-        # Criar diretório de backup se não existir
         os.makedirs(backup_dir, exist_ok=True)
         
-        # Configurar logging
         logging.basicConfig(
             level=logging.INFO,
             format='%(asctime)s - %(levelname)s - %(message)s',
@@ -37,10 +35,8 @@ class BackupSystem:
         )
         self.logger = logging.getLogger(__name__)
         
-        # Carregar configurações
         self.config = self.load_config()
         
-        # Thread para agendamento
         self.scheduler_thread = None
         self.running = False
     
@@ -48,7 +44,7 @@ class BackupSystem:
         """Carrega configurações de backup"""
         default_config = {
             "auto_backup_enabled": True,
-            "backup_frequency": "daily",  # daily, weekly, monthly
+            "backup_frequency": "daily",
             "backup_time": "02:00",
             "max_backups": 30,
             "compress_backups": True,
@@ -61,7 +57,6 @@ class BackupSystem:
             if os.path.exists(self.config_file):
                 with open(self.config_file, 'r') as f:
                     config = json.load(f)
-                    # Mesclar com configurações padrão
                     default_config.update(config)
             return default_config
         except Exception as e:
@@ -106,12 +101,10 @@ class BackupSystem:
         
         with zipfile.ZipFile(backup_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
             
-            # Backup do banco de dados
             if os.path.exists(self.db_path):
                 zipf.write(self.db_path, f"{backup_name}/database/clinic.db")
                 self.logger.info("Banco de dados incluído no backup")
             
-            # Backup de arquivos de configuração
             config_files = [
                 "config.py",
                 "backup_config.json",
@@ -122,7 +115,6 @@ class BackupSystem:
                 if os.path.exists(config_file):
                     zipf.write(config_file, f"{backup_name}/config/{config_file}")
             
-            # Backup de prescrições geradas
             if os.path.exists("prescricoes"):
                 for root, dirs, files in os.walk("prescricoes"):
                     for file in files:
@@ -131,7 +123,6 @@ class BackupSystem:
                         zipf.write(file_path, arc_path)
                 self.logger.info("Prescrições incluídas no backup")
             
-            # Backup de logs (se habilitado)
             if self.config["include_logs"] and os.path.exists("logs"):
                 for root, dirs, files in os.walk("logs"):
                     for file in files:
@@ -140,7 +131,6 @@ class BackupSystem:
                         zipf.write(file_path, arc_path)
                 self.logger.info("Logs incluídos no backup")
             
-            # Adicionar metadados do backup
             metadata = {
                 "backup_date": datetime.now().isoformat(),
                 "backup_type": "compressed",
@@ -151,11 +141,9 @@ class BackupSystem:
             
             zipf.writestr(f"{backup_name}/metadata.json", json.dumps(metadata, indent=2))
         
-        # Verificar integridade do backup
         if self._verify_backup(backup_path):
             self.logger.info(f"Backup criado com sucesso: {backup_path}")
 
-            # Limpar backups antigos
             self._cleanup_old_backups()
 
             return backup_path
@@ -167,14 +155,12 @@ class BackupSystem:
         
         os.makedirs(backup_path, exist_ok=True)
         
-        # Backup do banco de dados
         if os.path.exists(self.db_path):
             db_backup_dir = os.path.join(backup_path, "database")
             os.makedirs(db_backup_dir, exist_ok=True)
             shutil.copy2(self.db_path, os.path.join(db_backup_dir, "clinic.db"))
             self.logger.info("✅ Banco de dados copiado")
         
-        # Backup de configurações
         config_backup_dir = os.path.join(backup_path, "config")
         os.makedirs(config_backup_dir, exist_ok=True)
         
@@ -183,17 +169,14 @@ class BackupSystem:
             if os.path.exists(config_file):
                 shutil.copy2(config_file, config_backup_dir)
         
-        # Backup de prescrições
         if os.path.exists("prescricoes"):
             shutil.copytree("prescricoes", os.path.join(backup_path, "prescricoes"))
             self.logger.info("✅ Prescrições copiadas")
         
-        # Backup de logs (se habilitado)
         if self.config["include_logs"] and os.path.exists("logs"):
             shutil.copytree("logs", os.path.join(backup_path, "logs"))
             self.logger.info("✅ Logs copiados")
         
-        # Criar metadados
         metadata = {
             "backup_date": datetime.now().isoformat(),
             "backup_type": "folder",
@@ -214,20 +197,16 @@ class BackupSystem:
         try:
             if backup_path.endswith('.zip'):
                 with zipfile.ZipFile(backup_path, 'r') as zipf:
-                    # Testar integridade do ZIP
                     bad_files = zipf.testzip()
                     if bad_files:
                         self.logger.error(f"Arquivos corrompidos no backup: {bad_files}")
                         return False
                     
-                    # Verificar se contém arquivos essenciais
                     files = zipf.namelist()
                     has_metadata = any("metadata.json" in f for f in files)
 
-                    # Pelo menos deve ter metadados
                     return has_metadata
             else:
-                # Verificar backup em pasta
                 has_metadata = os.path.exists(os.path.join(backup_path, "metadata.json"))
 
                 return has_metadata
@@ -242,17 +221,14 @@ class BackupSystem:
             if not os.path.exists(self.backup_dir):
                 return
             
-            # Listar todos os backups
             backups = []
             for file in os.listdir(self.backup_dir):
                 file_path = os.path.join(self.backup_dir, file)
                 if os.path.isfile(file_path) or os.path.isdir(file_path):
                     backups.append((file_path, os.path.getctime(file_path)))
             
-            # Ordenar por data de criação (mais antigos primeiro)
             backups.sort(key=lambda x: x[1])
             
-            # Remover backups excedentes
             max_backups = self.config.get("max_backups", 30)
             if len(backups) > max_backups:
                 backups_to_remove = backups[:-max_backups]
@@ -285,7 +261,6 @@ class BackupSystem:
             if not os.path.exists(backup_path):
                 raise FileNotFoundError(f"Backup não encontrado: {backup_path}")
             
-            # Criar backup de segurança antes da restauração
             safety_backup = self.create_backup("pre_restore")
             self.logger.info(f"Backup de segurança criado: {safety_backup}")
             
@@ -302,27 +277,21 @@ class BackupSystem:
         """Restaura backup comprimido"""
         
         with zipfile.ZipFile(backup_path, 'r') as zipf:
-            # Extrair para diretório temporário
             temp_dir = "temp_restore"
             zipf.extractall(temp_dir)
             
-            # Encontrar diretório do backup
             backup_contents = os.listdir(temp_dir)
             backup_dir = os.path.join(temp_dir, backup_contents[0])
             
-            # Restaurar banco de dados
             db_backup = os.path.join(backup_dir, "database", "clinic.db")
             if os.path.exists(db_backup):
-                # Fazer backup do banco atual
                 if os.path.exists(self.db_path):
                     shutil.copy2(self.db_path, f"{self.db_path}.backup")
                 
-                # Restaurar banco
                 os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
                 shutil.copy2(db_backup, self.db_path)
                 self.logger.info("✅ Banco de dados restaurado")
             
-            # Restaurar prescrições
             prescricoes_backup = os.path.join(backup_dir, "prescricoes")
             if os.path.exists(prescricoes_backup):
                 if os.path.exists("prescricoes"):
@@ -330,7 +299,6 @@ class BackupSystem:
                 shutil.copytree(prescricoes_backup, "prescricoes")
                 self.logger.info("✅ Prescrições restauradas")
             
-            # Limpar diretório temporário
             shutil.rmtree(temp_dir)
         
         self.logger.info("✅ Restauração concluída com sucesso")
@@ -339,7 +307,6 @@ class BackupSystem:
     def _restore_folder_backup(self, backup_path):
         """Restaura backup em pasta"""
         
-        # Restaurar banco de dados
         db_backup = os.path.join(backup_path, "database", "clinic.db")
         if os.path.exists(db_backup):
             if os.path.exists(self.db_path):
@@ -349,7 +316,6 @@ class BackupSystem:
             shutil.copy2(db_backup, self.db_path)
             self.logger.info("✅ Banco de dados restaurado")
         
-        # Restaurar prescrições
         prescricoes_backup = os.path.join(backup_path, "prescricoes")
         if os.path.exists(prescricoes_backup):
             if os.path.exists("prescricoes"):
@@ -371,7 +337,6 @@ class BackupSystem:
             item_path = os.path.join(self.backup_dir, item)
             
             try:
-                # Obter metadados
                 metadata = None
                 if item.endswith('.zip'):
                     with zipfile.ZipFile(item_path, 'r') as zipf:
@@ -398,7 +363,6 @@ class BackupSystem:
             except Exception as e:
                 self.logger.error(f"Erro ao processar backup {item}: {e}")
         
-        # Ordenar por data de criação (mais recentes primeiro)
         backups.sort(key=lambda x: x['created'], reverse=True)
         
         return backups
@@ -423,7 +387,6 @@ class BackupSystem:
         
         self.running = True
         
-        # Configurar agendamento
         frequency = self.config["backup_frequency"]
         backup_time = self.config["backup_time"]
         
@@ -436,7 +399,6 @@ class BackupSystem:
         
         self.logger.info(f"Agendador iniciado: backup {frequency} às {backup_time}")
         
-        # Executar agendador em thread separada
         def run_scheduler():
             while self.running:
                 schedule.run_pending()
@@ -458,7 +420,6 @@ class BackupSystem:
             backup_path = self.create_backup("scheduled")
             self.logger.info(f"Backup automático concluído: {backup_path}")
             
-            # Enviar notificação por email (se configurado)
             if self.config["email_notifications"]:
                 self._send_email_notification(backup_path, "success")
                 
@@ -470,14 +431,10 @@ class BackupSystem:
     
     def _send_email_notification(self, backup_path, status, error_msg=None):
         """Envia notificação por email sobre o backup"""
-        # Implementar envio de email (opcional)
-        # Pode usar bibliotecas como smtplib, sendgrid, etc.
         pass
 
-# Instância global do sistema de backup
 backup_system = BackupSystem()
 
-# Função utilitária para uso direto
 def create_manual_backup():
     """Cria um backup manual"""
     return backup_system.create_backup("manual")
@@ -487,14 +444,11 @@ def start_auto_backup():
     backup_system.start_scheduler()
 
 if __name__ == "__main__":
-    # Teste do sistema de backup
     print("🔄 Testando sistema de backup...")
     
-    # Criar backup manual
     backup_path = create_manual_backup()
     print(f"✅ Backup criado: {backup_path}")
     
-    # Listar backups
     backups = backup_system.list_backups()
     print(f"📋 Total de backups: {len(backups)}")
     
