@@ -362,7 +362,7 @@ DATABASE_URL=sqlite:///data/clinic.db
 
 <div align="center">
 
-**Desenvolvido para a comunidade médica**
+**Desenvolvido para a comunidade médica - Nathalia Adriele**
 
 [![GitHub stars](https://img.shields.io/github/stars/nathadriele/clinic-care-system?style=social)](https://github.com/nathadriele/clinic-care-system/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/nathadriele/clinic-care-system?style=social)](https://github.com/nathadriele/clinic-care-system/network)
