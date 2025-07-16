@@ -76,8 +76,3 @@ SECURITY_CONFIG = {
     'session_timeout': 3600
 }
 ```
-
-## Suporte
-
-Sistema desenvolvido e testado com sucesso!  
-Todas as funcionalidades estão operacionais.
