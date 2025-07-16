@@ -5,17 +5,14 @@ from datetime import datetime
 import os
 from config import SERVER_CONFIG, APP_CONFIG
 
-# Importar componentes
 from components.sidebar import create_sidebar, create_mobile_navbar
 from components.navbar import create_navbar
 
-# Importar páginas
 try:
     from pages import home, agendamento, pacientes, medicos, prontuarios, prescricoes, financeiro, convenios, comunicacao, relatorios
     print("✅ Todas as páginas importadas com sucesso!")
 except ImportError as e:
     print(f"❌ Erro ao importar páginas: {e}")
-    # Importar páginas individualmente para debug
     try:
         from pages import home
         print("✅ Home importado")
@@ -52,7 +49,6 @@ except ImportError as e:
     except Exception as e:
         print(f"❌ Erro nos relatórios: {e}")
 
-# Inicializar a aplicação Dash
 app = dash.Dash(
     __name__,
     external_stylesheets=[
@@ -64,16 +60,12 @@ app = dash.Dash(
     update_title=None
 )
 
-# Configurar servidor
 server = app.server
 
-# Layout principal da aplicação
 app.layout = dbc.Container([
-    # Store para dados globais
     dcc.Store(id='session-store'),
     dcc.Store(id='theme-store', data='light'),
 
-    # Location para roteamento
     dcc.Location(id='url', refresh=False),
 
 
@@ -81,19 +73,15 @@ app.layout = dbc.Container([
     # Navbar mobile
     create_mobile_navbar(),
     
-    # Layout principal
     dbc.Row([
         # Sidebar
         dbc.Col([
             create_sidebar()
         ], md=2, className="d-none d-md-block p-0"),
         
-        # Conteúdo principal
         dbc.Col([
-            # Navbar desktop
             create_navbar(),
             
-            # Conteúdo da página
             html.Div(id='page-content', className="fade-in")
         ], md=10, className="p-0")
     ], className="g-0"),
@@ -208,7 +196,6 @@ def create_page_404():
         ], className="justify-content-center", style={"min-height": "60vh"})
     ], className="d-flex align-items-center")
 
-# Callback para toggle da sidebar mobile
 @app.callback(
     Output('sidebar', 'className'),
     Input('sidebar-toggle', 'n_clicks'),
@@ -221,7 +208,6 @@ def toggle_sidebar(n_clicks):
         return "sidebar show"
     return "sidebar"
 
-# Callback para controle de tema
 @app.callback(
     [Output('theme-store', 'data'),
      Output('theme-icon-navbar', 'className'),
@@ -240,7 +226,6 @@ def toggle_theme(n_clicks, current_theme):
 
     return current_theme, 'fas fa-moon text-primary', 'Escuro'
 
-# Callback para aplicar o tema
 app.clientside_callback(
     """
     function(theme) {
@@ -257,21 +242,16 @@ app.clientside_callback(
     prevent_initial_call=True
 )
 
-# Callback duplicado removido - o título já é atualizado no callback display_page
-
-# Função para inicializar dados de exemplo
 def init_sample_data():
     """Inicializa dados de exemplo se necessário"""
     
     try:
         from utils.db_manager import db_manager
         
-        # Verificar se já existem dados
         pacientes = db_manager.execute_query("SELECT COUNT(*) as total FROM pacientes")
         
         if pacientes.iloc[0]['total'] == 0:
             print("Inicializando dados de exemplo...")
-            # Os dados de exemplo já são criados no db_manager
             print("Dados de exemplo criados com sucesso!")
         else:
             print(f"Sistema já possui {pacientes.iloc[0]['total']} pacientes cadastrados.")
@@ -281,13 +261,10 @@ def init_sample_data():
 
 # Executar aplicação
 if __name__ == '__main__':
-    # Criar diretório de dados se não existir
     os.makedirs('data', exist_ok=True)
     
-    # Inicializar dados de exemplo
     init_sample_data()
     
-    # Configurações do servidor
     debug_mode = SERVER_CONFIG['debug']
     port = SERVER_CONFIG['port']
     host = SERVER_CONFIG['host']
@@ -296,13 +273,13 @@ if __name__ == '__main__':
     🏥 ClinicCare - Sistema de Gestão Clínica
     ========================================
     
-    🚀 Servidor iniciado com sucesso!
+     Servidor iniciado com sucesso!
     
-    📍 URL: http://{host}:{port}
-    🔧 Debug: {'Ativado' if debug_mode else 'Desativado'}
-    📅 Data: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}
+     URL: http://{host}:{port}
+     Debug: {'Ativado' if debug_mode else 'Desativado'}
+     Data: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}
     
-    📋 Funcionalidades disponíveis:
+     Funcionalidades disponíveis:
     • Dashboard com KPIs em tempo real
     • Agendamento de consultas
     • Prontuários eletrônicos
@@ -312,10 +289,9 @@ if __name__ == '__main__':
     • Comunicação com pacientes
     • Relatórios e análises
     
-    ⚡ Sistema pronto para uso!
+     Sistema pronto para uso!
     """)
     
-    # Executar aplicação
     app.run(
         debug=debug_mode,
         host=host,
