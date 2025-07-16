@@ -11,7 +11,6 @@ def add_sample_appointments():
     """Adiciona consultas de exemplo para os próximos dias"""
     
     try:
-        # Buscar pacientes e médicos existentes
         pacientes = db_manager.execute_query("SELECT id, nome FROM pacientes WHERE ativo = 1")
         medicos = db_manager.execute_query("SELECT id, nome FROM medicos WHERE ativo = 1")
         
@@ -21,10 +20,8 @@ def add_sample_appointments():
         
         print(f"📋 Encontrados {len(pacientes)} pacientes e {len(medicos)} médicos")
         
-        # Consultas de exemplo para os próximos 7 dias
         consultas_exemplo = []
         
-        # Hoje
         hoje = datetime.now().date()
         consultas_exemplo.extend([
             {
@@ -43,7 +40,6 @@ def add_sample_appointments():
             }
         ])
         
-        # Amanhã
         amanha = hoje + timedelta(days=1)
         consultas_exemplo.extend([
             {
@@ -69,7 +65,6 @@ def add_sample_appointments():
             }
         ])
         
-        # Depois de amanhã
         depois_amanha = hoje + timedelta(days=2)
         consultas_exemplo.extend([
             {
@@ -88,7 +83,6 @@ def add_sample_appointments():
             }
         ])
         
-        # Próxima semana
         proxima_semana = hoje + timedelta(days=5)
         consultas_exemplo.extend([
             {
@@ -107,25 +101,20 @@ def add_sample_appointments():
             }
         ])
         
-        # Inserir consultas
         consultas_inseridas = 0
         
         for consulta in consultas_exemplo:
-            # Selecionar paciente e médico aleatórios
             paciente = pacientes.sample(1).iloc[0]
             medico = medicos.sample(1).iloc[0]
             
-            # Combinar data e horário
             data_consulta = f"{consulta['data']} {consulta['horario']}:00"
             
-            # Verificar se já existe consulta neste horário
             existing = db_manager.execute_query('''
                 SELECT COUNT(*) as total FROM consultas 
                 WHERE medico_id = ? AND data_consulta = ?
             ''', (medico['id'], data_consulta))
             
             if existing.iloc[0]['total'] == 0:
-                # Inserir consulta
                 db_manager.execute_insert('''
                     INSERT INTO consultas 
                     (paciente_id, medico_id, data_consulta, valor, observacoes, status)
@@ -140,18 +129,18 @@ def add_sample_appointments():
                 ))
                 
                 consultas_inseridas += 1
-                print(f"✅ Consulta inserida: {consulta['data']} {consulta['horario']} - {paciente['nome']} com Dr(a). {medico['nome']}")
+                print(f" Consulta inserida: {consulta['data']} {consulta['horario']} - {paciente['nome']} com Dr(a). {medico['nome']}")
             else:
-                print(f"⚠️ Consulta já existe: {consulta['data']} {consulta['horario']} - Dr(a). {medico['nome']}")
+                print(f" Consulta já existe: {consulta['data']} {consulta['horario']} - Dr(a). {medico['nome']}")
         
-        print(f"\n🎉 {consultas_inseridas} consultas de exemplo adicionadas com sucesso!")
+        print(f"\n {consultas_inseridas} consultas de exemplo adicionadas com sucesso!")
         
         # Mostrar total de consultas
         total = db_manager.execute_query("SELECT COUNT(*) as total FROM consultas")
-        print(f"📊 Total de consultas no sistema: {total.iloc[0]['total']}")
+        print(f" Total de consultas no sistema: {total.iloc[0]['total']}")
         
     except Exception as e:
-        print(f"❌ Erro ao adicionar consultas: {e}")
+        print(f" Erro ao adicionar consultas: {e}")
         import traceback
         traceback.print_exc()
 
