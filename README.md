@@ -251,23 +251,22 @@ docker run -p 8050:8050 cliniccare
 ### **Nova Despesa**
 *Nova despesa para análises financeiras*
 
-![Financeiro](docs/screenshots/nova_despesa.png
+![Financeiro](docs/screenshots/nova_despesa.png)
 
 ### **Nova Despesa**
 *Nova despesa para análises financeiras*
 
-![Financeiro](docs/screenshots/nova_despesa.png
+![Financeiro](docs/screenshots/nova_despesa.png)
 
 ### **Convênios dos Pacientes**
 *Convênios aceitos*
 
-![Financeiro](docs/screenshots/convenio_1.png
+![Financeiro](docs/screenshots/convenio_1.png)
 
 ### **Convênios**
 *Convênios aceitos*
 
-![Financeiro](docs/screenshots/convenio_2.png
-
+![Financeiro](docs/screenshots/convenio_2.png)
 
 ## Estrutura do Projeto
 
