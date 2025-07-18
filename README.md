@@ -21,9 +21,9 @@ O **ClinicCare** é uma solução completa e moderna para gestão de clínicas m
 
 ### **Principais Diferenciais**
 
-- **Interface Moderna**: Design profissional com tema claro/escuro
 - **Dashboards Avançados**: Heatmaps, timelines e análises em tempo real
-- **100% Responsivo**: Funciona perfeitamente em desktop, tablet e mobile
+- **Interface Moderna**: Design moderno com tema claro/escuro
+- **100% Responsivo**: Funciona em desktop, tablet e mobile
 - **Dados Seguros**: Tratamento robusto de dados e prevenção de erros
 - **Fácil Instalação**: Setup em menos de 5 minutos
 - **Código Limpo**: Arquitetura modular e bem documentada
@@ -286,7 +286,6 @@ clinic_care_system/
 - Design moderno e responsivo
 - Navegação intuitiva
 - Cores suaves e contrastes adequados
-- Compatível com desktop, tablet e mobile
 
 ## Segurança
 
